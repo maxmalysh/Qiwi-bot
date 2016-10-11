@@ -3,6 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.common.action_chains import ActionChains
+from pyvirtualdisplay import Display
 import time
 import os
 
@@ -78,7 +79,7 @@ def _qiwi(login, password, req, sum, browser):
             __login(login, password, browser)
             break
     time.sleep(5)
-    requisites = browser.find_elements_by_css_selector("qiwi-textinput.ui-mask")[0]
+    requisites = browser.find_element_by_css_selector(".qiwi-textinput.ui-mask")
     ActionChains(browser).move_to_element(requisites).perform()
     requisites.click()
     time.sleep(1)
@@ -264,6 +265,8 @@ def _visa(login, password, req, sum, browser):
 
 
 def transfer(login, password, type, req, sum):
+    display = Display(visible=0, size=(800, 600))
+    display.start()
     browser = __firefox()
     if type == 'qiwi':
         _qiwi(login, password, req, sum, browser)
@@ -276,3 +279,6 @@ def transfer(login, password, type, req, sum):
         _visa(login, password, req, sum, browser)
     else:
         return '404'
+    display.stop()
+
+_qiwi('+79188237800', 'test1234', '79188373128', '1', __firefox())
