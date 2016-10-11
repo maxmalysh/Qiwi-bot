@@ -281,4 +281,16 @@ def transfer(login, password, type, req, sum):
         return '404'
     display.stop()
 
-_qiwi('+79188237800', 'test1234', '79188373128', '1', __firefox())
+
+def get_balance(login, password):
+    browser = __settings()
+    browser.get("https://qiwi.com")
+    # Finding and accepting login form
+    browser.find_element_by_class_name("header-login-item-login").click()
+    log = browser.find_element_by_name("login")
+    log.clear()
+    log.send_keys(login)
+    browser.find_element_by_name("password").send_keys(password)
+    log.send_keys(Keys.RETURN)
+    time.sleep(3)
+    return browser.find_element_by_class_name('account_current_amount').text.strip()
