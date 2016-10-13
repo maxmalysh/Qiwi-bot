@@ -1,4 +1,4 @@
-#!/usr/local/bin/python.exe
+#!D:/Users/gorno/AppData/Local/Programs/Python/Python35-32/python.exe
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
@@ -40,21 +40,17 @@ def is_user_exists(login, password):
     log.send_keys(Keys.RETURN)
     time.sleep(3)
     browser.execute_script('window.stop();')
-    for i in range(20):
+    for i in range(25):
         time.sleep(1)
-        if 'выйти' in browser.page_source.lower() or 'quit' in browser.page_source.lower():
-            time.sleep(5)
-            browser.get_screenshot_as_file('C://Users/gorno/Desktop/qiwi/screenshots/valid.png')
+        if 'https://qiwi.com/main.action' == browser.current_url:
             browser.quit()
             return True
-    browser.get_screenshot_as_file('C://Users/gorno/Desktop/qiwi/screenshots/invalid.png')
     browser.quit()
     return False
 
 
 def __quit(browser):
-    browser.get("https://qiwi.com")
-    if 'quit' or 'выйти' in browser.page_source.lower():
+    if browser.find_element_by_class_name('logout'):
         browser.find_element_by_class_name('logout').find_element_by_tag_name('a').click()
 
 
@@ -67,7 +63,6 @@ def __login(login, password, browser):
     time.sleep(1)
     log.send_keys(Keys.RETURN)
     time.sleep(3)
-    browser.execute_script('window.stop();')
 
 
 def _qiwi(login, password, req, sum, browser):
@@ -279,11 +274,12 @@ def transfer(login, password, type, req, sum):
         _visa(login, password, req, sum, browser)
     else:
         return '404'
+    browser.quit()
     display.stop()
-
 
 def get_balance(login, password):
     browser = __settings()
+    time.sleep(2)
     browser.get("https://qiwi.com")
     # Finding and accepting login form
     browser.find_element_by_class_name("header-login-item-login").click()
@@ -292,5 +288,8 @@ def get_balance(login, password):
     log.send_keys(login)
     browser.find_element_by_name("password").send_keys(password)
     log.send_keys(Keys.RETURN)
-    time.sleep(3)
-    return browser.find_element_by_class_name('account_current_amount').text.strip()
+    while 'настройки' not in browser.page_source.lower():
+        time.sleep(0.5)
+    response = browser.find_element_by_class_name('account_current_amount').text.strip()
+    browser.quit()
+    return response
