@@ -131,8 +131,12 @@ def _alpha_card(login, password,  req, month, year, sum, browser):
     mnth.click()
     time.sleep(1)
     browser.execute_script("document.getElementsByClassName('goog-inline-block qiwi-select-caption')[0].textContent= '"+text+"'")
-    browser.execute_script("document.getElementsByClassName('qiwi-select-menu qiwi-select-menu-vertical')[0].getElementsByClassName('qiwi-select-menu-item')["+str(int(month)-1)+"].setAttribute('role', 'option')")
-    browser.execute_script("document.getElementsByClassName('qiwi-select-menu qiwi-select-menu-vertical')[0].setAttribute('aria-activedescedant', '"+mnth.id+"')")
+    browser.execute_script("document.getElementsByClassName"
+                           "('qiwi-select-menu qiwi-select-menu-vertical')"
+                           "[0].getElementsByClassName('qiwi-select-menu-item')"
+                           "["+str(int(month)-1)+"].setAttribute('role', 'option')")
+    browser.execute_script("document.getElementsByClassName('qiwi-select-menu qiwi-select-menu-vertical')[0]"
+                           ".setAttribute('aria-activedescedant', '"+mnth.id+"')")
 
     # choosing year
     years = browser.find_element_by_class_name("qiwi-year-month-year")
