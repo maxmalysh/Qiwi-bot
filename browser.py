@@ -28,7 +28,7 @@ def __firefox():
     return webdriver.Firefox()
 
 
-def is_user_exists(login, password):
+def user_exists(login, password):
     browser = __settings()
     browser.get("https://qiwi.com")
     # Finding and accepting login form
