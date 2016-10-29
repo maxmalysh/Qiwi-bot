@@ -3,7 +3,6 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.common.action_chains import ActionChains
-from pyvirtualdisplay import Display
 import time
 import os
 
@@ -20,11 +19,6 @@ def __settings():
 
 
 def __firefox():
-    """SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
-    wires = os.path.join(SITE_ROOT, "static", "wires.exe")
-    firefox_capabilities = DesiredCapabilities.FIREFOX
-    firefox_capabilities['marionette'] = True
-    browser = webdriver.Firefox(capabilities=firefox_capabilities, executable_path=wires)"""
     return webdriver.Firefox()
 
 
@@ -264,8 +258,6 @@ def _visa(login, password, req, sum, browser):
 
 
 def transfer(login, password, type, req, sum):
-    display = Display(visible=0, size=(800, 600))
-    display.start()
     browser = __firefox()
     if type == 'qiwi':
         _qiwi(login, password, req, sum, browser)
@@ -279,7 +271,7 @@ def transfer(login, password, type, req, sum):
     else:
         return '404'
     browser.quit()
-    display.stop()
+
 
 def get_balance(login, password):
     browser = __settings()
@@ -297,3 +289,37 @@ def get_balance(login, password):
     response = browser.find_element_by_class_name('account_current_amount').text.strip()
     browser.quit()
     return response
+
+
+def get_today_income(login, password, last_transaction_code):
+    driver = __firefox()
+    driver.get("https://qiwi.com/report/list.action?type=1")
+    for i in range(20):
+        time.sleep(1)
+        if 'вход' or 'sign' in driver.page_source.lower():
+            __login(login, password, driver)
+            break
+    time.sleep(5)
+    blocks = driver.find_elements_by_css_selector('.reportsLine.status_SUCCESS')
+    income_blocks = []
+    for i in blocks:
+        try:
+            i.find_element_by_class_name('cheque')
+            print(i.find_element_by_class_name('cheque').text.strip())
+        except:
+            code = i.find_element_by_class_name('transaction').text.strip()
+            if code == last_transaction_code:
+                break
+            income_blocks.append(i)
+    income_sum = []
+    comments = []
+    for j in income_blocks:
+        income_sum.append(j.find_element_by_class_name('cash'))
+        comments.append(j.find_element_by_class_name('comment'))
+    balance = driver.find_element_by_class_name('account_current_amount').text
+    last_transaction = income_blocks[0].find_element_by_class_name('transaction').text.strip()
+    response = ''
+    print(income_blocks)
+    for j in range(len(income_blocks)):
+        response += income_sum[j].text.strip() + "|" + comments[j].text.strip() + " "
+    return response + "%" + last_transaction + "$" + balance
